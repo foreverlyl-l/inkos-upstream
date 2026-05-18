@@ -140,14 +140,13 @@ describe("providers structural integrity", () => {
     expect(getAllEndpoints().length).toBe(38);
   });
 
-  it("B6：CodingPlan provider 除 MiniMax 外都走 anthropic-messages", () => {
+  it("B6：CodingPlan provider 都走 anthropic-messages", () => {
     for (const id of [
       "kimiCodingPlan", "minimaxCodingPlan", "bailianCodingPlan",
       "glmCodingPlan", "volcengineCodingPlan", "opencodeCodingPlan",
       "astronCodingPlan", "kimicode",
     ]) {
-      const expected = id === "minimaxCodingPlan" ? "openai-completions" : "anthropic-messages";
-      expect(getEndpoint(id)?.api).toBe(expected);
+      expect(getEndpoint(id)?.api).toBe("anthropic-messages");
     }
   });
 

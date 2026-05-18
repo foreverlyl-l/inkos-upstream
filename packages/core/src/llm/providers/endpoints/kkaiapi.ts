@@ -48,7 +48,8 @@ export const KKAIAPI: InkosEndpoint = {
     { id: "mimo-v2.5-pro", maxOutput: 32768, contextWindowTokens: 128000 },
     { id: "mimo-v2.5", maxOutput: 32768, contextWindowTokens: 128000 },
     { id: "mimo-v2-pro", maxOutput: 32768, contextWindowTokens: 128000 },
-    { id: "MiniMax-M2.7", maxOutput: 64000, contextWindowTokens: 1_000_000 },
+    // Hide until kkaiapi exposes a verified MiniMax chat route/model id.
+    { id: "MiniMax-M2.7", maxOutput: 64000, contextWindowTokens: 1_000_000, enabled: false, status: "disabled" },
     { id: "gpt-image-2-pro", maxOutput: 1, contextWindowTokens: 1, enabled: false, status: "nonText", capabilities: { text: false, imageOutput: true } },
     { id: "gpt-image-2", maxOutput: 1, contextWindowTokens: 1, enabled: false, status: "nonText", capabilities: { text: false, imageOutput: true } },
   ],
