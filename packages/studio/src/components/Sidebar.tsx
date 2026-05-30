@@ -27,6 +27,7 @@ import {
   MessageSquare,
   Gamepad2,
   ScrollText,
+  BookPlus,
   Boxes,
   Wand2,
   FileInput,
@@ -39,6 +40,17 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+import { InkosLogo } from "./InkosLogo";
+
+// 历史记录里的会话混装多种类型（chat / short / play / book-create），用图标区分。
+function SessionKindIcon({ kind, className }: { readonly kind?: string; readonly className?: string }) {
+  const Icon =
+    kind === "play" ? Gamepad2
+    : kind === "short" ? ScrollText
+    : kind === "book-create" ? BookPlus
+    : MessageSquare;
+  return <Icon size={13} className={className} />;
+}
 
 interface BookSummary {
   readonly id: string;
@@ -242,9 +254,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
           onClick={nav.toDashboard}
           className="group flex items-center gap-2 hover:opacity-80 transition-all duration-300"
         >
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
-            <ScrollText size={18} />
-          </div>
+          <InkosLogo className="w-8 h-8 shrink-0 group-hover:scale-105 transition-transform" />
           <div className="flex flex-col">
             <span className="font-serif text-xl leading-none italic font-medium">InkOS</span>
             <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-bold mt-1">Studio</span>
@@ -272,8 +282,8 @@ export function Sidebar({ nav, activePage, sse, t }: {
                   : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
               }`}
             >
-              <Plus size={16} className={activePage === "book-create" ? "text-primary" : "text-muted-foreground"} />
-              <span className="flex-1">{t("nav.newBook")}</span>
+              <BookPlus size={16} className={activePage === "book-create" ? "text-primary" : "text-muted-foreground"} />
+              <span className="flex-1">{t("nav.createNovel")}</span>
             </button>
             <button
               type="button"
@@ -281,8 +291,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-muted-foreground transition-all hover:bg-secondary/50 hover:text-foreground"
             >
               <ScrollText size={16} className="text-muted-foreground" />
-              <span className="flex-1">InkOS Short</span>
-              <span className="text-[10px] text-muted-foreground/60">短篇</span>
+              <span className="flex-1">{t("nav.createShort")}</span>
             </button>
             <button
               type="button"
@@ -290,8 +299,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-muted-foreground transition-all hover:bg-secondary/50 hover:text-foreground"
             >
               <Gamepad2 size={16} className="text-muted-foreground" />
-              <span className="flex-1">InkOS Play</span>
-              <span className="text-[10px] text-muted-foreground/60">互动</span>
+              <span className="flex-1">{t("nav.createPlay")}</span>
             </button>
           </div>
 
@@ -397,50 +405,8 @@ export function Sidebar({ nav, activePage, sse, t }: {
           </div>
         </div>
 
-        {/* System Section */}
+        {/* History Section */}
         <div>
-          <div className="px-3 mb-3">
-            <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-bold">
-              {t("nav.system")}
-            </span>
-          </div>
-          <div className="space-y-1">
-            <SidebarItem
-              label={t("create.genre")}
-              icon={<Boxes size={16} />}
-              active={activePage === "genres"}
-              onClick={nav.toGenres}
-            />
-            <SidebarItem
-              label={t("nav.config")}
-              icon={<Settings size={16} />}
-              active={activePage === "services"}
-              onClick={nav.toServices}
-            />
-{/*            <SidebarItem
-              label={t("nav.daemon")}
-              icon={<Zap size={16} />}
-              active={activePage === "daemon"}
-              onClick={nav.toDaemon}
-              badge={daemon?.running ? t("nav.running") : undefined}
-              badgeColor={daemon?.running ? "bg-emerald-500/10 text-emerald-500" : "bg-muted text-muted-foreground"}
-            />*/}
-            <SidebarItem
-              label={t("nav.logs")}
-              icon={<Terminal size={16} />}
-              active={activePage === "logs"}
-              onClick={nav.toLogs}
-            />
-          </div>
-        </div>
-
-        {/* Tools Section */}
-        <div>
-          <div className="px-3 mb-3">
-            <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-bold">
-              {t("nav.tools")}
-            </span>
-          </div>
           <div className="space-y-1">
             <div>
               <div className="group/chat flex items-center">
@@ -460,7 +426,7 @@ export function Sidebar({ nav, activePage, sse, t }: {
                   }`}
                 >
                   <MessageSquare size={16} className={activePage === "chat" ? "text-primary" : "text-muted-foreground group-hover/chat:text-foreground"} />
-                  <span className="flex-1 text-left">{t("nav.chat")}</span>
+                  <span className="flex-1 text-left">{t("nav.history")}</span>
                   <ChevronRight
                     size={13}
                     className={`text-muted-foreground/60 transition-transform ${projectChatExpanded ? "rotate-90" : ""}`}
@@ -483,6 +449,10 @@ export function Sidebar({ nav, activePage, sse, t }: {
                           onClick={() => openProjectChatSession(session.sessionId)}
                           className="flex min-w-0 flex-1 items-center gap-2 pl-9 pr-2 py-1 text-left text-[13px] transition-colors"
                         >
+                          <SessionKindIcon
+                            kind={session.sessionKind}
+                            className={`shrink-0 ${isActiveSession ? "text-foreground" : "text-muted-foreground/60 group-hover/session:text-foreground"}`}
+                          />
                           <span className={`truncate flex-1 ${isActiveSession ? "text-foreground" : "text-muted-foreground group-hover/session:text-foreground"}`}>
                             {label}
                           </span>
@@ -533,6 +503,54 @@ export function Sidebar({ nav, activePage, sse, t }: {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* System Section */}
+        <div>
+          <div className="px-3 mb-3">
+            <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-bold">
+              {t("nav.system")}
+            </span>
+          </div>
+          <div className="space-y-1">
+            <SidebarItem
+              label={t("create.genre")}
+              icon={<Boxes size={16} />}
+              active={activePage === "genres"}
+              onClick={nav.toGenres}
+            />
+            <SidebarItem
+              label={t("nav.config")}
+              icon={<Settings size={16} />}
+              active={activePage === "services"}
+              onClick={nav.toServices}
+            />
+{/*            <SidebarItem
+              label={t("nav.daemon")}
+              icon={<Zap size={16} />}
+              active={activePage === "daemon"}
+              onClick={nav.toDaemon}
+              badge={daemon?.running ? t("nav.running") : undefined}
+              badgeColor={daemon?.running ? "bg-emerald-500/10 text-emerald-500" : "bg-muted text-muted-foreground"}
+            />*/}
+            <SidebarItem
+              label={t("nav.logs")}
+              icon={<Terminal size={16} />}
+              active={activePage === "logs"}
+              onClick={nav.toLogs}
+            />
+          </div>
+        </div>
+
+        {/* Tools Section */}
+        <div>
+          <div className="px-3 mb-3">
+            <span className="text-[11px] uppercase tracking-widest text-muted-foreground font-bold">
+              {t("nav.tools")}
+            </span>
+          </div>
+          <div className="space-y-1">
             <SidebarItem
               label={t("nav.style")}
               icon={<Wand2 size={16} />}

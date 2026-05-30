@@ -6,6 +6,9 @@ const strings = {
   // Header
   "nav.books": { zh: "书籍", en: "Books" },
   "nav.newBook": { zh: "新建书籍", en: "New Book" },
+  "nav.createNovel": { zh: "InkOS 小说", en: "InkOS Novel" },
+  "nav.createShort": { zh: "InkOS 短篇", en: "InkOS Short" },
+  "nav.createPlay": { zh: "InkOS 互动", en: "InkOS Play" },
   "nav.config": { zh: "模型配置", en: "Model Config" },
   "nav.connected": { zh: "已连接", en: "Connected" },
   "nav.disconnected": { zh: "未连接", en: "Disconnected" },
@@ -83,7 +86,7 @@ const strings = {
   "nav.agentOnline": { zh: "代理在线", en: "Agent Online" },
   "nav.agentOffline": { zh: "代理离线", en: "Agent Offline" },
   "nav.tools": { zh: "工具", en: "Tools" },
-  "nav.chat": { zh: "普通聊天", en: "Chat" },
+  "nav.history": { zh: "历史记录", en: "History" },
   "nav.style": { zh: "文风", en: "Style" },
   "nav.import": { zh: "导入", en: "Import" },
   "nav.radar": { zh: "市场雷达", en: "Radar" },
