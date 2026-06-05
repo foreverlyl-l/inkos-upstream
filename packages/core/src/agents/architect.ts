@@ -79,6 +79,18 @@ export interface ArchitectOutput {
   readonly roles?: ReadonlyArray<ArchitectRole>;
 }
 
+export class ArchitectIncompleteFoundationError extends Error {
+  readonly missing: readonly string[];
+  readonly partialContent: string;
+
+  constructor(missing: readonly string[], partialContent: string, message?: string) {
+    super(message ?? `Architect foundation incomplete; missing sections: ${missing.join(", ")}`);
+    this.name = "ArchitectIncompleteFoundationError";
+    this.missing = missing;
+    this.partialContent = partialContent;
+  }
+}
+
 class MissingArchitectSectionsError extends Error {
   readonly missing: readonly string[];
   readonly content: string;
@@ -613,7 +625,11 @@ You MUST emit all **5 SECTION blocks in order**: story_frame → volume_map → 
             : `基础设定没有生成完整(缺少:${missing})。`
               + "这通常是模型一次没把所有部分写全,不是你的输入有问题。"
               + "点重试,或换更强的模型(如 deepseek-v4-pro / gpt-5.5)再生成一次,通常就能解决。";
-          throw new Error(message, { cause: repairError });
+          throw new ArchitectIncompleteFoundationError(
+            repairError.missing,
+            repairError.content,
+            message,
+          );
         }
         throw repairError;
       }

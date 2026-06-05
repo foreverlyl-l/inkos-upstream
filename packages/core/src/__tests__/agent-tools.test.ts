@@ -3,6 +3,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { StateManager } from "../state/manager.js";
+import { ArchitectIncompleteFoundationError } from "../agents/architect.js";
 import {
   createReadTool,
   createGenerateCoverTool,
@@ -283,6 +284,38 @@ describe("agent deterministic writing tools", () => {
         externalContext: "创建《夜间派送》，番茄，100章以内。",
       }),
     );
+  });
+
+  it("returns an architect incomplete result instead of throwing when foundation repair fails", async () => {
+    const pipeline = {
+      initBook: vi.fn(async () => {
+        throw new ArchitectIncompleteFoundationError(
+          ["roles", "pending_hooks"],
+          "=== SECTION: story_frame ===\n已有世界观草稿",
+          "基础设定没有生成完整。",
+        );
+      }),
+    };
+    const tool = createSubAgentTool(pipeline as never, null);
+
+    const result = await tool.execute("tool-architect-incomplete", {
+      agent: "architect",
+      title: "夜港账本",
+      instruction: "写一本港风商战小说",
+    });
+
+    expect(result.content[0]?.type).toBe("text");
+    if (result.content[0]?.type === "text") {
+      expect(result.content[0].text).toContain("基础设定没有生成完整");
+      expect(result.content[0].text).toContain("roles");
+      expect(result.content[0].text).toContain("pending_hooks");
+      expect(result.content[0].text).toContain("继续补齐");
+    }
+    expect(result.details).toMatchObject({
+      kind: "architect_incomplete",
+      missing: ["roles", "pending_hooks"],
+      partialContent: expect.stringContaining("已有世界观草稿"),
+    });
   });
 
   it("passes chapterWordCount through the writer sub-agent", async () => {

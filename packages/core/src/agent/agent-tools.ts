@@ -1,6 +1,7 @@
 import { Type, type Static } from "@mariozechner/pi-ai";
 import type { AgentTool, AgentToolResult, AgentToolUpdateCallback } from "@mariozechner/pi-agent-core";
 import type { PipelineRunner } from "../pipeline/runner.js";
+import { ArchitectIncompleteFoundationError } from "../agents/architect.js";
 import { type ReviseMode } from "../agents/reviser.js";
 import { defaultChapterLength } from "../utils/length-metrics.js";
 import { inferLanguage } from "../utils/language.js";
@@ -517,6 +518,23 @@ export function createSubAgentTool(
             return textResult(`Unknown agent: ${agent}`);
         }
       } catch (err: any) {
+        if (agent === "architect" && err instanceof ArchitectIncompleteFoundationError) {
+          const missing = err.missing.join(", ");
+          return textResult(
+            [
+              err.message,
+              "",
+              `缺失 section: ${missing}`,
+              "我会把已生成的部分保留下来，并继续补齐缺失 section；不要重新发明一本书。",
+            ].join("\n"),
+            {
+              kind: "architect_incomplete",
+              missing: [...err.missing],
+              partialContent: err.partialContent,
+              retryInstruction: `Continue repairing the architect foundation. Preserve the partial content and fill missing sections: ${missing}.`,
+            },
+          );
+        }
         console.error(`[sub_agent] "${agent}" failed:`, err);
         throw err;
       }
