@@ -18,7 +18,8 @@ export type HashRoute =
   | { page: "style" }
   | { page: "import"; tab?: "chapters" | "canon" | "fanfic" | "spinoff" | "imitation" }
   | { page: "radar" }
-  | { page: "doctor" };
+  | { page: "doctor" }
+  | { page: "play"; projectId: string };
 
 function parseHash(hash: string): HashRoute {
   const path = hash.replace(/^#\/?/, "");
@@ -41,6 +42,9 @@ function parseHash(hash: string): HashRoute {
   const bookMatch = path.match(/^book\/([^/]+)$/);
   if (bookMatch) return { page: "book", bookId: decodeURIComponent(bookMatch[1]) };
 
+  const playMatch = path.match(/^play\/([^/]+)$/);
+  if (playMatch) return { page: "play", projectId: decodeURIComponent(playMatch[1]) };
+
   return { page: "dashboard" };
 }
 
@@ -55,6 +59,7 @@ function routeToHash(route: HashRoute): string {
     case "project-settings": return "#/settings";
     case "import": return route.tab ? `#/import/${route.tab}` : "#/import";
     case "service-detail": return `#/services/${encodeURIComponent(route.serviceId)}`;
+    case "play": return `#/play/${encodeURIComponent(route.projectId)}`;
     default: return "";
   }
 }
