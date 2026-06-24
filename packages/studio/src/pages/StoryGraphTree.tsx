@@ -10,6 +10,11 @@ interface Nav {
   toPlay: (id: string) => void;
 }
 
+interface ValidationReport {
+  ok: boolean;
+  issues: { code: string; level: "error" | "warning" | "info"; message: string; nodeIds: string[] }[];
+}
+
 export function StoryGraphTree({
   projectId,
   nav,
@@ -23,6 +28,7 @@ export function StoryGraphTree({
 }) {
   const c = useColors(theme);
   const { data: graph, loading, error, refetch } = useApi<StoryGraph>(`/projects/${projectId}/story-graph`);
+  const { data: validation } = useApi<ValidationReport>(`/projects/${projectId}/story-graph/validation`);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
@@ -77,6 +83,26 @@ export function StoryGraphTree({
           试玩 →
         </button>
       </div>
+
+      {validation && (
+        <div className="border rounded p-3" data-testid="validation-panel">
+          <div className={`text-sm font-medium ${c.muted}`}>校验{validation.ok ? "" : "（有阻断问题）"}</div>
+          {validation.issues.length === 0 ? (
+            <div className={`text-sm ${c.muted}`}>无问题</div>
+          ) : (
+            <ul className="mt-1 space-y-1">
+              {validation.issues.map((issue, i) => (
+                <li key={i} data-testid={`validation-issue-${issue.code}`} className="text-xs flex gap-2">
+                  <span className={
+                    issue.level === "error" ? "text-red-500" : issue.level === "warning" ? "text-amber-500" : "text-slate-400"
+                  }>[{issue.level}]</span>
+                  <span>{issue.message}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {saveError && (
         <div className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-400" data-testid="film-save-error">
