@@ -78,6 +78,7 @@ import {
   filmLLMDepsFromClient,
   applyGraphDelta,
   loadStoryGraph,
+  reviewStoryGraph,
   generateNodeImage,
   defaultNodeImageDeps,
   type NodeImageDeps,
@@ -4978,6 +4979,18 @@ export function createStudioServer(initialConfig: ProjectConfig, root: string, o
       }
       throw error;
     }
+  });
+
+  app.get("/api/v1/projects/:id/story-graph/validation", async (c) => {
+    const id = c.req.param("id");
+    if (!isSafeBookId(id)) {
+      return c.json({ error: { code: "INVALID_ID", message: `invalid project id: ${id}` } }, 400);
+    }
+    const graph = await loadStoryGraph(root, id);
+    if (!graph) {
+      return c.json({ error: { code: "NOT_FOUND", message: `story graph not found for ${id}` } }, 404);
+    }
+    return c.json(reviewStoryGraph(graph));
   });
 
   app.post("/api/v1/projects/:id/nodes/:nodeId/image", async (c) => {
