@@ -8,6 +8,7 @@ import type { StoryGraph, StoryNode } from "@actalk/inkos-core/interactive-film/
 interface Nav {
   toDashboard: () => void;
   toPlay: (id: string) => void;
+  toFlow: (id: string) => void;
 }
 
 interface ValidationReport {
@@ -81,6 +82,13 @@ export function StoryGraphTree({
           data-testid="film-play"
         >
           试玩 →
+        </button>
+        <button
+          onClick={() => nav.toFlow(projectId)}
+          className="px-3 py-1 rounded bg-blue-600 text-white"
+          data-testid="open-flow"
+        >
+          流程图 →
         </button>
       </div>
 
