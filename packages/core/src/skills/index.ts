@@ -1,6 +1,13 @@
 export { BUILTIN_CAPABILITY_SKILLS } from "./builtin.js";
 export { BUILTIN_PROMPTS, BUILTIN_PROMPT_PACKS, type BuiltinPrompt } from "./builtin-prompts.js";
 export {
+  buildSkillContextPlan,
+  contextNeedById,
+  contextNeedPurpose,
+  type SkillContextPlan,
+  type SkillContextPlanInput,
+} from "./context-planner.js";
+export {
   PromptPackPromptNotFoundError,
   getBuiltinPrompt,
   listBuiltinPromptPacks,
